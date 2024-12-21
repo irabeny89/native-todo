@@ -11,12 +11,15 @@ export type TodoItemData = {
 };
 
 export type TodoItemProps = {
-  setTodos: (value: React.SetStateAction<TodoItemData[]>) => void;
-  todos: TodoItemData[];
   text: string;
   index: number;
   isDone: boolean;
   serialNumber: number;
+  editableTodo: TodoItemData | null;
+  todos: TodoItemData[];
+  setTodoText: Dispatch<SetStateAction<string>>;
+  setTodos: (value: SetStateAction<TodoItemData[]>) => void;
+  setEditableTodo: React.Dispatch<React.SetStateAction<TodoItemData | null>>;
 };
 
 export type CustomInputProps = {
