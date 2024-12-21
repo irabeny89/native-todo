@@ -9,6 +9,7 @@ export default function TodoItem({
   text,
   index,
   isDone,
+  serialNumber,
 }: TodoItemProps) {
   const toggleCheckbox = (prev: boolean) => {
     // toggle current todo item checkbox value
@@ -25,7 +26,7 @@ export default function TodoItem({
 
   return (
     <View style={styles.container}>
-      <Text>{index + 1}.</Text>
+      <Text>{serialNumber}.</Text>
       <Checkbox value={isDone} onValueChange={toggleCheckbox} />
       <Text style={isDone ? styles.todoText : undefined}>{text}</Text>
     </View>

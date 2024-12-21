@@ -16,6 +16,7 @@ export type TodoItemProps = {
   text: string;
   index: number;
   isDone: boolean;
+  serialNumber: number;
 };
 
 export type CustomInputProps = {

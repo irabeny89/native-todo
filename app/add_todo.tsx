@@ -58,8 +58,13 @@ export default function AddTodo() {
         <ScrollView scrollEnabled style={styles.todoOutput}>
           <FlatList
             data={todos}
-            renderItem={({ item }) => (
-              <TodoItem {...item} todos={todos} setTodos={setTodos} />
+            renderItem={({ item, index }) => (
+              <TodoItem
+                {...item}
+                todos={todos}
+                setTodos={setTodos}
+                serialNumber={index + 1}
+              />
             )}
           />
         </ScrollView>
