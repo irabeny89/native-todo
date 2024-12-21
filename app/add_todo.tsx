@@ -25,13 +25,15 @@ export default function AddTodo() {
   ) => {
     if (todoText) {
       // append todo input to list of todos
-      setTodos((prev) =>
-        prev.concat({
+      setTodos((prev) => [
+        {
           index: todos.length, // compute index from prev items
           text: todoText,
           isDone: false,
-        }),
-      );
+        },
+        ...prev,
+      ]);
+
       // clear input
       setTodoText("");
     }
@@ -56,13 +58,8 @@ export default function AddTodo() {
         <ScrollView scrollEnabled style={styles.todoOutput}>
           <FlatList
             data={todos}
-            renderItem={({ item, index }) => (
-              <TodoItem
-                index={index}
-                text={item.text}
-                todos={todos}
-                setTodos={setTodos}
-              />
+            renderItem={({ item }) => (
+              <TodoItem {...item} todos={todos} setTodos={setTodos} />
             )}
           />
         </ScrollView>

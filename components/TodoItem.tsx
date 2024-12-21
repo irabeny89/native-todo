@@ -1,4 +1,4 @@
-import type { TodoItemProps } from "@/types";
+import type { TodoItemData, TodoItemProps } from "@/types";
 import Checkbox from "expo-checkbox";
 import { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,27 +8,26 @@ export default function TodoItem({
   todos,
   text,
   index,
+  isDone,
 }: TodoItemProps) {
-  const todoData = todos.find((todo) => todo.index === index);
   const toggleCheckbox = (prev: boolean) => {
     // toggle current todo item checkbox value
-    const updatedData = todos.map((todo) => {
-      if (todo.index === index) {
-        todo.isDone = !todo.isDone;
-      }
-      return todo;
-    });
+    const updatedData = todos
+      .map((todo) => {
+        if (todo.index === index) {
+          todo.isDone = !todo.isDone;
+        }
+        return todo;
+      })
+      .sort((a, b) => +a.isDone - +b.isDone);
     setTodos(updatedData);
   };
 
   return (
     <View style={styles.container}>
       <Text>{index + 1}.</Text>
-      <Checkbox
-        value={todoData?.isDone || false}
-        onValueChange={toggleCheckbox}
-      />
-      <Text>{text}</Text>
+      <Checkbox value={isDone} onValueChange={toggleCheckbox} />
+      <Text style={isDone ? styles.todoText : undefined}>{text}</Text>
     </View>
   );
 }
@@ -38,5 +37,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     marginBottom: 10,
+  },
+  todoText: {
+    color: "gray",
   },
 });
