@@ -19,20 +19,30 @@ export default function AddTodo() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [todoText, setTodoText] = useState("");
+  const [editableTodo, setEditableTodo] = useState<TodoItemData | null>(null);
 
   const handleSubmit = (
     e: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
   ) => {
     if (todoText) {
+      // in edit mode
+      if (editableTodo) {
+        todos.map((todo) => {
+          if (todo.index === editableTodo.index) todo.text = todoText;
+          return todo;
+        });
+        setEditableTodo(null); // clear edit
+      }
       // append todo input to list of todos
-      setTodos((prev) => [
-        {
-          index: todos.length, // compute index from prev items
-          text: todoText,
-          isDone: false,
-        },
-        ...prev,
-      ]);
+      else
+        setTodos((prev) => [
+          {
+            index: todos.length, // compute index from prev items
+            text: todoText,
+            isDone: false,
+          },
+          ...prev,
+        ]);
 
       // clear input
       setTodoText("");
@@ -64,6 +74,9 @@ export default function AddTodo() {
                 todos={todos}
                 setTodos={setTodos}
                 serialNumber={index + 1}
+                setTodoText={setTodoText}
+                editableTodo={editableTodo}
+                setEditableTodo={setEditableTodo}
               />
             )}
           />
