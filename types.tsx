@@ -15,6 +15,7 @@ export type TodoItemProps = {
   todos: TodoItemData[];
   text: string;
   index: number;
+  isDone: boolean;
 };
 
 export type CustomInputProps = {
