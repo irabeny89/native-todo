@@ -33,3 +33,7 @@ export type CustomInputProps = {
   placeholderTextColor?: string;
   style?: object;
 };
+
+export type DividerProps = {
+  axis?: "x" | "y";
+};
