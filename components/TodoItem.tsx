@@ -31,11 +31,16 @@ export default function TodoItem({
     setTodoText(text);
   };
 
+  const deleteItem = () => {
+    setTodos(todos.filter((todo) => todo.index !== index));
+    if (editableTodo?.index === index) setTodoText("");
+  };
+
   return (
     <View style={styles.container}>
       <Text>{serialNumber}.</Text>
       <Checkbox value={isDone} onValueChange={toggleCheckbox} />
-      <Pressable onPress={editText}>
+      <Pressable onLongPress={editText}>
         <Text
           style={[
             isDone ? styles.todoText : undefined,
@@ -44,6 +49,9 @@ export default function TodoItem({
         >
           {text}
         </Text>
+      </Pressable>
+      <Pressable onPress={deleteItem}>
+        <Text style={styles.deleteIcon}>{"🗑"}</Text>
       </Pressable>
     </View>
   );
@@ -60,5 +68,11 @@ const styles = StyleSheet.create({
   },
   todoTextEditable: {
     textDecorationLine: "underline",
+    backgroundColor: "lightgray",
+  },
+  deleteIcon: {
+    backgroundColor: "red",
+    borderRadius: 2,
+    padding: 2,
   },
 });
