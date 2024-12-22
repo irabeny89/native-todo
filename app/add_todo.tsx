@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   FlatList,
@@ -10,7 +9,6 @@ import {
 import { useState } from "react";
 import CustomTextInput from "@/components/CustomTextInput";
 import type { TodoItemData } from "@/types";
-import Divider from "@/components/Divider";
 import { Fragment } from "react";
 import TodoItem from "@/components/TodoItem";
 
@@ -64,7 +62,6 @@ export default function AddTodo() {
           onChangeText={setDescription}
           placeholder="Optional short description"
         />
-        <Divider />
         <ScrollView scrollEnabled style={styles.todoOutput}>
           <FlatList
             data={todos}
@@ -100,6 +97,12 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     marginHorizontal: 5,
     gap: 24,
+  },
+  divider: {
+    backgroundColor: "gray",
+    height: 2,
+    width: "96%",
+    alignSelf: "center",
   },
   todoInput: {
     position: "fixed",

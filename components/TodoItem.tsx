@@ -1,6 +1,7 @@
 import type { TodoItemProps } from "@/types";
 import Checkbox from "expo-checkbox";
 import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useState } from "react";
 
 export default function TodoItem({
   setTodos,
@@ -13,6 +14,14 @@ export default function TodoItem({
   setEditableTodo,
   editableTodo,
 }: TodoItemProps) {
+  const [showOptions, setShowOptions] = useState(false);
+
+  const toggleOptions = () => {
+    if (showOptions) {
+      setEditableTodo(null);
+      setShowOptions(false);
+    } else setShowOptions(true);
+  };
   const toggleCheckbox = (prev: boolean) => {
     // toggle current todo item checkbox value
     const updatedData = todos
@@ -37,23 +46,24 @@ export default function TodoItem({
   };
 
   return (
-    <View style={styles.container}>
-      <Text>{serialNumber}.</Text>
-      <Checkbox value={isDone} onValueChange={toggleCheckbox} />
-      <Pressable onLongPress={editText}>
-        <Text
-          style={[
-            isDone ? styles.todoText : undefined,
-            editableTodo?.index === index ? styles.todoTextEditable : undefined,
-          ]}
-        >
-          {text}
-        </Text>
-      </Pressable>
-      <Pressable onPress={deleteItem}>
-        <Text style={styles.deleteIcon}>{"🗑"}</Text>
-      </Pressable>
-    </View>
+    <Pressable onLongPress={toggleOptions}>
+      <View style={[styles.container, showOptions ? styles.target : undefined]}>
+        {showOptions && (
+          <View style={styles.overlay}>
+            <Pressable onPress={editText}>
+              <Text style={styles.editBtn}>Edit</Text>
+            </Pressable>
+            <View style={styles.divider} />
+            <Pressable onPress={deleteItem}>
+              <Text style={styles.delBtn}>Delete</Text>
+            </Pressable>
+          </View>
+        )}
+        <Text>{serialNumber}.</Text>
+        <Checkbox value={isDone} onValueChange={toggleCheckbox} />
+        <Text style={[isDone ? styles.todoText : undefined]}>{text}</Text>
+      </View>
+    </Pressable>
   );
 }
 
@@ -61,18 +71,38 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     gap: 10,
-    marginBottom: 10,
+    paddingVertical: 4,
+    borderBottomColor: "grey",
+    borderBottomWidth: 1,
+  },
+  target: {
+    borderColor: "grey",
+    borderWidth: 2,
   },
   todoText: {
     color: "gray",
   },
-  todoTextEditable: {
-    textDecorationLine: "underline",
-    backgroundColor: "lightgray",
+  overlay: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    zIndex: 2,
+    backgroundColor: "lightgrey",
+    flexDirection: "row",
+    gap: 4,
   },
-  deleteIcon: {
-    backgroundColor: "red",
-    borderRadius: 2,
-    padding: 2,
+  editBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 5,
+  },
+  delBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 5,
+  },
+  divider: {
+    backgroundColor: "grey",
+    height: 24,
+    width: 2,
+    alignSelf: "center",
   },
 });
