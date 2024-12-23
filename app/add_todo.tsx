@@ -11,6 +11,7 @@ import CustomTextInput from "@/components/CustomTextInput";
 import type { TodoItemData } from "@/types";
 import { Fragment } from "react";
 import TodoItem from "@/components/TodoItem";
+import { MARGIN_TOP } from "@/constants";
 
 export default function AddTodo() {
   const [todos, setTodos] = useState<TodoItemData[]>([]);
@@ -26,7 +27,7 @@ export default function AddTodo() {
       // in edit mode
       if (editableTodo) {
         todos.map((todo) => {
-          if (todo.index === editableTodo.index) todo.text = todoText;
+          if (todo.id === editableTodo.id) todo.text = todoText;
           return todo;
         });
         setEditableTodo(null); // clear edit
@@ -35,7 +36,7 @@ export default function AddTodo() {
       else
         setTodos((prev) => [
           {
-            index: todos.length, // compute index from prev items
+            id: todos.length, // compute index from prev items
             text: todoText,
             isDone: false,
           },
@@ -93,7 +94,7 @@ export default function AddTodo() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 10,
+    marginTop: MARGIN_TOP,
     marginBottom: 50,
     marginHorizontal: 5,
     gap: 24,

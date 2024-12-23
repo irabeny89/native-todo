@@ -7,7 +7,7 @@ export default function TodoItem({
   setTodos,
   todos,
   text,
-  index,
+  id,
   isDone,
   serialNumber,
   setTodoText,
@@ -26,7 +26,7 @@ export default function TodoItem({
     // toggle current todo item checkbox value
     const updatedData = todos
       .map((todo) => {
-        if (todo.index === index) {
+        if (todo.id === id) {
           todo.isDone = !todo.isDone;
         }
         return todo;
@@ -36,13 +36,13 @@ export default function TodoItem({
   };
 
   const editText = () => {
-    setEditableTodo({ index, isDone, text });
+    setEditableTodo({ id, isDone, text });
     setTodoText(text);
   };
 
   const deleteItem = () => {
-    setTodos(todos.filter((todo) => todo.index !== index));
-    if (editableTodo?.index === index) setTodoText("");
+    setTodos(todos.filter((todo) => todo.id !== id));
+    if (editableTodo?.id === id) setTodoText("");
   };
 
   return (
