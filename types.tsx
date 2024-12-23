@@ -5,14 +5,14 @@ import type {
 import type { Dispatch, SetStateAction } from "react";
 
 export type TodoItemData = {
-  index: number;
+  id: number;
   isDone: boolean;
   text: string;
 };
 
 export type TodoItemProps = {
   text: string;
-  index: number;
+  id: number;
   isDone: boolean;
   serialNumber: number;
   editableTodo: TodoItemData | null;
@@ -36,4 +36,12 @@ export type CustomInputProps = {
 
 export type DividerProps = {
   axis?: "x" | "y";
+};
+
+export type TodoContext = {
+  title: string;
+  description?: string;
+  todoItems: TodoItemData[];
+  createdAt: string;
+  updatedAt: string;
 };
