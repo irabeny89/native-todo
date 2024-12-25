@@ -38,10 +38,31 @@ export type DividerProps = {
   axis?: "x" | "y";
 };
 
-export type TodoContext = {
+export type Todo = {
   title: string;
   description?: string;
   todoItems: TodoItemData[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type TodoReducerAction = {
+  type: keyof TodoActionTemplate;
+  index: number;
+  value: string | TodoItemData[];
+};
+/**
+ * TODO: function to update all fields in `Todo` type
+ */
+export type TodoActionTemplate = {
+  setTitle: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setDescription: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setTodoItems: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setCreatedAt: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setUpdatedAt: (todos: Todo[], action: TodoReducerAction) => Todo[];
+};
+
+export type TodosContextValue = {
+  todos: Todo[];
+  mutateTodos: Dispatch<TodoReducerAction>;
 };
