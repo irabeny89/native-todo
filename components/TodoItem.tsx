@@ -1,7 +1,19 @@
-import type { TodoItemProps } from "@/types";
 import Checkbox from "expo-checkbox";
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
+import type { TodoItemData } from "@/app/add_todo";
+
+type TodoItemProps = {
+  text: string;
+  id: number;
+  isDone: boolean;
+  serialNumber: number;
+  editableTodo: TodoItemData | null;
+  todos: TodoItemData[];
+  setTodoText: Dispatch<SetStateAction<string>>;
+  setTodos: (value: SetStateAction<TodoItemData[]>) => void;
+  setEditableTodo: React.Dispatch<React.SetStateAction<TodoItemData | null>>;
+};
 
 export default function TodoItem({
   setTodos,

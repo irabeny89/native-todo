@@ -1,4 +1,4 @@
-import type { CustomInputProps } from "@/types";
+import type { Dispatch, SetStateAction } from "react";
 import {
   type NativeSyntheticEvent,
   StyleSheet,
@@ -8,6 +8,18 @@ import {
   type TextInputSubmitEditingEventData,
   View,
 } from "react-native";
+
+type CustomInputProps = {
+  name?: string;
+  value: string;
+  onChangeText: Dispatch<SetStateAction<string>>;
+  onSubmitEditing?:
+    | ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void)
+    | undefined;
+  placeholder?: string;
+  placeholderTextColor?: string;
+  style?: object;
+};
 
 export default function CustomTextInput({
   name,
