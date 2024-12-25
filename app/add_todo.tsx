@@ -8,10 +8,15 @@ import {
 } from "react-native";
 import { useState } from "react";
 import CustomTextInput from "@/components/CustomTextInput";
-import type { TodoItemData } from "@/types";
 import { Fragment } from "react";
 import TodoItem from "@/components/TodoItem";
 import { MARGIN_TOP } from "@/constants";
+
+export type TodoItemData = {
+  id: number;
+  isDone: boolean;
+  text: string;
+};
 
 export default function AddTodo() {
   const [todos, setTodos] = useState<TodoItemData[]>([]);

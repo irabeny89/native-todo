@@ -1,11 +1,34 @@
-import type {
-  Todo,
-  TodoActionTemplate,
-  TodoItemData,
-  TodoReducerAction,
-  TodosContextValue,
-} from "@/types";
-import { createContext, useReducer, type PropsWithChildren } from "react";
+import type { TodoItemData } from "@/app/add_todo";
+import {
+  createContext,
+  type Dispatch,
+  useReducer,
+  type PropsWithChildren,
+} from "react";
+
+type TodosContextValue = {
+  todos: Todo[];
+  mutateTodos: Dispatch<TodoReducerAction>;
+};
+type TodoActionTemplate = {
+  setTitle: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setDescription: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setTodoItems: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setCreatedAt: (todos: Todo[], action: TodoReducerAction) => Todo[];
+  setUpdatedAt: (todos: Todo[], action: TodoReducerAction) => Todo[];
+};
+type TodoReducerAction = {
+  type: keyof TodoActionTemplate;
+  index: number;
+  value: string | TodoItemData[];
+};
+type Todo = {
+  title: string;
+  description?: string;
+  todoItems: TodoItemData[];
+  createdAt: string;
+  updatedAt: string;
+};
 
 const updateTitle =
   (action: TodoReducerAction) => (todo: Todo, index: number) =>
