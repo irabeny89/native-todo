@@ -5,14 +5,14 @@ import type { TodoItemData } from "@/app/add_todo";
 
 type TodoItemProps = {
   text: string;
-  id: number;
+  id: string;
   isDone: boolean;
   serialNumber: number;
-  editableTodo: TodoItemData | null;
   todos: TodoItemData[];
   setTodoText: Dispatch<SetStateAction<string>>;
   setTodos: (value: SetStateAction<TodoItemData[]>) => void;
-  setEditableTodo: React.Dispatch<React.SetStateAction<TodoItemData | null>>;
+  editableTodoItemId: string;
+  setEditableTodoItemId: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function TodoItem({
@@ -23,14 +23,14 @@ export default function TodoItem({
   isDone,
   serialNumber,
   setTodoText,
-  setEditableTodo,
-  editableTodo,
+  setEditableTodoItemId,
+  editableTodoItemId,
 }: TodoItemProps) {
   const [showOptions, setShowOptions] = useState(false);
 
   const toggleOptions = () => {
     if (showOptions) {
-      setEditableTodo(null);
+      setEditableTodoItemId("");
       setShowOptions(false);
     } else setShowOptions(true);
   };
@@ -48,13 +48,13 @@ export default function TodoItem({
   };
 
   const editText = () => {
-    setEditableTodo({ id, isDone, text });
+    setEditableTodoItemId(id);
     setTodoText(text);
   };
 
   const deleteItem = () => {
     setTodos(todos.filter((todo) => todo.id !== id));
-    if (editableTodo?.id === id) setTodoText("");
+    if (editableTodoItemId === id) setTodoText("");
   };
 
   return (

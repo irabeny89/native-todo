@@ -6,42 +6,47 @@ import {
   type TextInputSubmitEditingEventData,
   type NativeSyntheticEvent,
 } from "react-native";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import CustomTextInput from "@/components/CustomTextInput";
 import { Fragment } from "react";
 import TodoItem from "@/components/TodoItem";
 import { MARGIN_TOP } from "@/constants";
+import { TodoContext } from "@/components/TodoContextProvider";
 
 export type TodoItemData = {
-  id: number;
+  id: string;
   isDone: boolean;
   text: string;
 };
 
 export default function AddTodo() {
-  const [todos, setTodos] = useState<TodoItemData[]>([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [todoText, setTodoText] = useState("");
-  const [editableTodo, setEditableTodo] = useState<TodoItemData | null>(null);
+
+  const todoCtx = useContext(TodoContext);
 
   const handleSubmit = (
     e: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
   ) => {
-    if (todoText) {
+    if (todoText && todoCtx) {
+      const {
+        editableTodoItemId,
+        setEditableTodoItemId,
+        setTodoItems,
+        todoItems,
+      } = todoCtx;
       // in edit mode
-      if (editableTodo) {
-        todos.map((todo) => {
-          if (todo.id === editableTodo.id) todo.text = todoText;
+      if (editableTodoItemId) {
+        todoItems.map((todo) => {
+          if (todo.id === editableTodoItemId) todo.text = todoText;
           return todo;
         });
-        setEditableTodo(null); // clear edit
+        setEditableTodoItemId(""); // clear edit
       }
       // append todo input to list of todos
       else
-        setTodos((prev) => [
+        setTodoItems((prev) => [
           {
-            id: todos.length, // compute index from prev items
+            id: Date.now().toString(), // compute index from prev items
             text: todoText,
             isDone: false,
           },
@@ -53,33 +58,33 @@ export default function AddTodo() {
     }
   };
 
-  return (
+  return !todoCtx ? null : (
     <Fragment>
       <View style={styles.container}>
         <CustomTextInput
           name="Title"
-          value={title}
-          onChangeText={setTitle}
+          value={todoCtx?.title ?? ""}
+          onChangeText={todoCtx.setTitle}
           placeholder="Name your todos"
         />
         <CustomTextInput
           name="Description"
-          value={description}
-          onChangeText={setDescription}
+          value={todoCtx?.description ?? ""}
+          onChangeText={todoCtx.setDescription}
           placeholder="Optional short description"
         />
         <ScrollView scrollEnabled style={styles.todoOutput}>
           <FlatList
-            data={todos}
+            data={todoCtx?.todoItems}
             renderItem={({ item, index }) => (
               <TodoItem
                 {...item}
-                todos={todos}
-                setTodos={setTodos}
+                todos={todoCtx?.todoItems ?? []}
+                setTodos={todoCtx.setTodoItems}
                 serialNumber={index + 1}
                 setTodoText={setTodoText}
-                editableTodo={editableTodo}
-                setEditableTodo={setEditableTodo}
+                editableTodoItemId={todoCtx.editableTodoItemId}
+                setEditableTodoItemId={todoCtx.setEditableTodoItemId}
               />
             )}
           />
