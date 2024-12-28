@@ -1,1 +1,1 @@
-export const MARGIN_TOP = 10;
+export const MARGIN_TOP = 20;
