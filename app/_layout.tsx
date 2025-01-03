@@ -1,3 +1,4 @@
+import AddTodoBtn from "@/components/AddTodoBtn";
 import MutateAction from "@/components/MutateAction";
 import TodosContextProvider from "@/components/TodoContextProvider";
 import { Stack } from "expo-router";
@@ -6,13 +7,17 @@ export default function RootLayout() {
   return (
     <TodosContextProvider>
       <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
-          name="add_todo"
+          name="index"
           options={{
-            headerBackVisible: true,
-            title: "",
-            headerRight: MutateAction,
+            title: "TodoSync v1",
+            headerRight: AddTodoBtn,
+          }}
+        />
+        <Stack.Screen
+          name="todos"
+          options={{
+            headerShown: false,
           }}
         />
       </Stack>

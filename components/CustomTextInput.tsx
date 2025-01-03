@@ -11,7 +11,8 @@ import {
 
 type CustomInputProps = {
   name?: string;
-  value: string;
+  value?: string;
+  defaultValue?: string;
   onChangeText: Dispatch<SetStateAction<string>>;
   onSubmitEditing?:
     | ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void)
@@ -26,6 +27,7 @@ export default function CustomTextInput({
   onChangeText,
   onSubmitEditing,
   value,
+  defaultValue,
   placeholder,
   placeholderTextColor = "gray",
   style = {},
@@ -38,6 +40,7 @@ export default function CustomTextInput({
       <TextInput
         style={{ ...styles.input, ...style }}
         value={value}
+        defaultValue={defaultValue}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor}
