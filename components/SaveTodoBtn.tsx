@@ -8,31 +8,23 @@ export default function SaveBtn() {
   const router = useRouter();
 
   const handleSave = () => {
-    if (todoCtx) {
-      const {
-        title,
-        description,
-        todoItems,
-        mutateTodoStore,
-        setTitle,
-        setDescription,
-        setTodoItems,
-      } = todoCtx;
-      mutateTodoStore({
+    // `title` is required to create a todo
+    if (todoCtx?.currentTitle) {
+      todoCtx.mutateTodoStore({
         type: "save",
         value: {
           id: Date.now().toString(),
-          title,
-          description,
-          todoItems,
-          createdAt: new Date().toLocaleDateString(),
-          updatedAt: new Date().toLocaleDateString(),
+          title: todoCtx.currentTitle,
+          description: todoCtx.currentDescription,
+          todoItems: todoCtx.currentTodoItems,
+          createdAt: new Date().toString(),
+          updatedAt: new Date().toString(),
         },
       });
       // clear inputs
-      setTitle("");
-      setDescription("");
-      setTodoItems([]);
+      todoCtx.setCurrentTitle("");
+      todoCtx.setCurrentDescription("");
+      todoCtx.setCurrentTodoItems([]);
       // back to home screen
       router.dismissTo("/");
     }

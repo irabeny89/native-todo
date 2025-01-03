@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TodoContext } from "./TodoContextProvider";
@@ -6,38 +6,28 @@ import { TodoContext } from "./TodoContextProvider";
 export default function UpdateBtn() {
   const todoCtx = useContext(TodoContext);
   const router = useRouter();
+  const { id } = useLocalSearchParams();
 
   const handleUpdate = () => {
-    if (todoCtx) {
-      const {
-        title,
-        description,
-        todoItems,
-        mutateTodoStore,
-        editableTodoId,
-        setTitle,
-        setDescription,
-        setTodoItems,
-        setEditableTodoId,
-      } = todoCtx;
-      mutateTodoStore({
+    const oldTodo = todoCtx?.todoStore.find((todo) => todo.id === id);
+    // `title` is required to create a todo
+    if (todoCtx?.currentTitle && oldTodo) {
+      todoCtx.mutateTodoStore({
         type: "update",
-        id: editableTodoId,
+        id: id as string,
         value: {
-          id: new Date().toString(),
-          title,
-          description,
-          todoItems,
-          createdAt: new Date().toLocaleDateString(),
-          updatedAt: new Date().toLocaleDateString(),
+          id: id as string,
+          title: todoCtx.currentTitle,
+          description: todoCtx.currentDescription,
+          todoItems: todoCtx.currentTodoItems,
+          createdAt: oldTodo.createdAt,
+          updatedAt: new Date().toString(),
         },
       });
-      // clear edit mode
-      setEditableTodoId("");
       // clear inputs
-      setTitle("");
-      setDescription("");
-      setTodoItems([]);
+      todoCtx.setCurrentTitle("");
+      todoCtx.setCurrentDescription("");
+      todoCtx.setCurrentTodoItems([]);
       // back to home screen
       router.dismissTo("/");
     }
