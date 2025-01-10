@@ -5,19 +5,15 @@ import DeleteBtn from "./DeleteTodoBtn";
 export default function MutateAction() {
   return (
     <View style={styles.container}>
-      <View>
-        <DeleteBtn />
-      </View>
-      <View>
-        <UpdateBtn />
-      </View>
+      <DeleteBtn />
+      <UpdateBtn />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    // flex: 1,
     flexDirection: "row",
-    gap: 10,
   },
 });

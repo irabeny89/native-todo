@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  type TextInputKeyPressEventData,
   type TextInputSubmitEditingEventData,
   View,
 } from "react-native";

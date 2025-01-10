@@ -1,57 +1,65 @@
 import NoTodoYet from "@/components/NoTodoYet";
-import {
-  TodoContext,
-  type Todo,
-  type TodoItemData,
-} from "@/components/TodoContextProvider";
 import TodoInfo from "@/components/TodoInfo";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
 import { getTimeDiff } from "@/utils";
-import { useRouter } from "expo-router";
+import type { Todo, TodoItemData } from "@/hooks/usePersistTodo";
+import usePersistTodo from "@/hooks/usePersistTodo";
+import { TODO_STORE_KEY } from "@/constants";
+import AddTodoBtn from "@/components/AddTodoBtn";
+import { TodoContext } from "@/components/TodoContextProvider";
 
-export default function Index() {
-  const [refreshing, setRefreshing] = useState(false);
-  const router = useRouter();
-  const todoCtx = useContext(TodoContext);
-  const todoStore = todoCtx?.todoStore ?? [];
-
+const renderTodo = (todo: Todo) => {
   const deriveDoneTodosCount = (todo: TodoItemData[]) =>
     todo.reduce((acc, curr) => acc + Number(curr.isDone), 0);
 
-  const onRefresh = () => {
-    router.push("/");
-  };
-
-  const renderTodo = (todo: Todo) => (
+  return (
     <TodoInfo
+      title={todo.title}
+      todoItemsCount={todo.todoItems.length}
+      description={todo.description}
       createdAt={new Date(todo.createdAt).toLocaleDateString()}
       doneTodosCount={deriveDoneTodosCount(todo.todoItems)}
       id={todo.id}
       lastUpdate={getTimeDiff(new Date(todo.updatedAt).valueOf())}
-      title={todo.title}
-      todoItemsCount={todo.todoItems.length}
-      description={todo.description}
     />
   );
+};
 
-  return (
-    <View style={styles.container}>
-      {todoStore.length ? (
-        <Fragment>
+export default function Index() {
+  const { getStoredTodos } = usePersistTodo(TODO_STORE_KEY);
+  const todoCtx = useContext(TodoContext);
+
+  const getLatestTodos = () => {
+    if (todoCtx) getStoredTodos().then(todoCtx.setStoredTodos);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
+  useEffect(() => {
+    getLatestTodos();
+  }, []);
+
+  return !todoCtx ? null : (
+    <Fragment>
+      <View style={styles.addBtn}>
+        <AddTodoBtn />
+      </View>
+      <View style={styles.container}>
+        {todoCtx.storedTodos.length ? (
           <FlatList
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={false} onRefresh={getLatestTodos} />
             }
-            data={todoStore}
+            data={todoCtx.storedTodos}
             keyExtractor={({ id }) => id}
             renderItem={({ item }) => renderTodo(item)}
           />
-        </Fragment>
-      ) : (
-        <NoTodoYet />
-      )}
-    </View>
+        ) : (
+          <NoTodoYet />
+        )}
+      </View>
+    </Fragment>
   );
 }
 
@@ -74,5 +82,11 @@ const styles = StyleSheet.create({
     width: 200,
     textAlign: "center",
     fontSize: 14,
+  },
+  addBtn: {
+    position: "absolute",
+    right: 30,
+    bottom: 30,
+    zIndex: 2,
   },
 });

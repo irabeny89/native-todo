@@ -1,12 +1,15 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, StyleSheet, Text, View, Alert } from "react-native";
+import { StyleSheet, View, Alert, Button } from "react-native";
 import { TodoContext } from "./TodoContextProvider";
+import { COLORS, TODO_STORE_KEY } from "@/constants";
+import usePersistTodo from "@/hooks/usePersistTodo";
 
 export default function DeleteBtn() {
   const { id } = useLocalSearchParams();
   const todoCtx = useContext(TodoContext);
   const router = useRouter();
+  const { deleteTodo } = usePersistTodo(TODO_STORE_KEY);
 
   const handleDelete = () => {
     if (todoCtx) {
@@ -16,16 +19,13 @@ export default function DeleteBtn() {
           text: "Delete",
           style: "destructive",
           onPress() {
-            todoCtx.mutateTodoStore({
-              type: "delete",
-              id: id as string,
+            // delete the todo from storage
+            deleteTodo(id as string).then((data) => {
+              // update the stored todos in context
+              todoCtx.setStoredTodos(data);
+              // back to home screen
+              router.dismissTo("/");
             });
-            // clear inputs
-            todoCtx.setCurrentTitle("");
-            todoCtx.setCurrentDescription("");
-            todoCtx.setCurrentTodoItems([]);
-            // back to home screen
-            router.dismissTo("/");
           },
         },
       ]);
@@ -33,19 +33,13 @@ export default function DeleteBtn() {
   };
   return (
     <View style={styles.container}>
-      <Pressable onPress={handleDelete}>
-        <Text style={styles.text}>Delete</Text>
-      </Pressable>
+      <Button title="Delete" color={COLORS.danger} onPress={handleDelete} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // marginRight: 10,
-  },
-  text: {
-    color: "red",
-    fontWeight: "bold",
+    flex: 1,
   },
 });

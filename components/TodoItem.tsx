@@ -1,12 +1,13 @@
-import type { TodoItemData } from "@/components/TodoContextProvider";
 import Checkbox from "expo-checkbox";
 import {
   type Dispatch,
   type MutableRefObject,
   type SetStateAction,
+  useEffect,
   useState,
 } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import type { TodoItemAction } from "./TodoContextProvider";
 
 type TodoItemProps = {
   text: string;
@@ -14,17 +15,17 @@ type TodoItemProps = {
   isDone: boolean;
   serialNumber: number;
   setTodoText: Dispatch<SetStateAction<string>>;
-  setTodoItems: (value: SetStateAction<TodoItemData[]>) => void;
-  editTodoItemIdRef: MutableRefObject<string>;
+  mutateCurrentTodoItems: (value: TodoItemAction) => void;
+  currentTodoItemEditIdRef: MutableRefObject<string>;
 };
 type OptionsOverlayProps = {
-  editText: () => void;
+  setEditText: () => void;
   deleteItem: () => void;
 };
 
-const OptionsOverlay = ({ deleteItem, editText }: OptionsOverlayProps) => (
+const OptionsOverlay = ({ deleteItem, setEditText }: OptionsOverlayProps) => (
   <View style={styles.overlay}>
-    <Pressable onPress={editText}>
+    <Pressable onPress={setEditText}>
       <Text style={styles.editBtn}>Edit</Text>
     </Pressable>
     <View style={styles.divider} />
@@ -35,46 +36,53 @@ const OptionsOverlay = ({ deleteItem, editText }: OptionsOverlayProps) => (
 );
 
 export default function TodoItem({
-  setTodoItems,
   text,
   id,
   isDone,
   serialNumber,
   setTodoText,
-  editTodoItemIdRef,
+  mutateCurrentTodoItems,
+  currentTodoItemEditIdRef,
 }: TodoItemProps) {
   const [showOptions, setShowOptions] = useState(false);
+  const [isChecked, setIsChecked] = useState(isDone);
 
   const toggleOptions = () => {
     setShowOptions((prev) => !prev);
   };
-  const toggleCheckbox = (prev: boolean) => {
+  const toggleCheckbox = (id: string, isDone: boolean) => {
     // toggle current todo item checkbox
-    setTodoItems((items) =>
-      items
-        .map((item) =>
-          item.id === id ? { ...item, isDone: !item.isDone } : item,
-        )
-        .sort((a, b) => +a.isDone - +b.isDone),
-    );
+    mutateCurrentTodoItems({
+      name: "TOGGLE_DONE",
+      value: { id, isDone },
+    });
   };
-  const editText = () => {
+  const setEditText = () => {
+    // reference current todo item id for edit
+    currentTodoItemEditIdRef.current = id;
+    // set todo text to edit
     setTodoText(text);
-    // set id to indicate edit mode
-    editTodoItemIdRef.current = id;
   };
   const deleteItem = () => {
-    setTodoItems((items) => items.filter((item) => item.id !== id));
-    setTodoText("");
+    mutateCurrentTodoItems({
+      name: "REMOVE_ITEM",
+      value: id,
+    });
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
+  useEffect(() => {
+    toggleCheckbox(id, isChecked);
+  }, [isChecked]);
 
   return (
     <Pressable onLongPress={toggleOptions}>
       <View style={[styles.container, showOptions ? styles.target : undefined]}>
-        {showOptions && <OptionsOverlay {...{ deleteItem, editText }} />}
+        {showOptions && <OptionsOverlay {...{ deleteItem, setEditText }} />}
         <Text>{serialNumber}.</Text>
-        <Checkbox value={isDone} onValueChange={toggleCheckbox} />
-        <Text style={[isDone ? styles.todoText : undefined]}>{text}</Text>
+        <Checkbox value={isChecked} onValueChange={setIsChecked} />
+        <Text style={[isChecked ? styles.todoText : undefined]}>{text}</Text>
       </View>
     </Pressable>
   );

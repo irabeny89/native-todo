@@ -1,4 +1,3 @@
-import SaveBtn from "@/components/SaveTodoBtn";
 import { Stack } from "expo-router";
 
 export default function TodoLayout() {
@@ -8,13 +7,12 @@ export default function TodoLayout() {
         name="new"
         options={{
           title: "New Entry",
-          headerRight: SaveBtn,
         }}
       />
       <Stack.Screen
-        name="edit"
+        name="[id]"
         options={{
-          headerShown: false,
+          title: "Edit Entry",
         }}
       />
     </Stack>

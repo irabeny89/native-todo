@@ -3,7 +3,7 @@
  * @param timestamp in milliseconds
  * @returns time string `eg 1sec ago`
  */
-export function getTimeDiff (timestamp: number) {
+export function getTimeDiff(timestamp: number) {
   let time = "";
   // diff in seconds
   const diff = Math.round((Date.now() - timestamp) / 1e3);
@@ -14,4 +14,8 @@ export function getTimeDiff (timestamp: number) {
   else time = `${+(diff / 86400).toFixed()}days ago`;
 
   return time;
-};
+}
+
+export function sortDoneLast<T extends Record<"isDone", boolean>>(a: T, b: T) {
+  return Number(a.isDone) - Number(b.isDone);
+}
