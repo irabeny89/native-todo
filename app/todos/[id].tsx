@@ -1,67 +1,74 @@
 import CustomTextInput from "@/components/CustomTextInput";
 import TodoItem from "@/components/TodoItem";
-import { MARGIN_TOP } from "@/constants";
-import useTodoControl from "@/hooks/useTodoControl";
+import { BOXED_STYLES, MARGINS, TODO_STORE_KEY } from "@/constants";
+import useTodoItemControl from "@/hooks/useTodoItemControl";
 import { useLocalSearchParams } from "expo-router";
 import { Fragment, useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
+import usePersistTodo from "@/hooks/usePersistTodo";
+import { sortDoneLast } from "@/utils";
+import MutateAction from "@/components/MutateAction";
 
 export default function EditTodo() {
   const { id } = useLocalSearchParams();
-  const todoCtrl = useTodoControl();
+  const todoCtrl = useTodoItemControl();
+  const { getStoredTodos } = usePersistTodo(TODO_STORE_KEY);
 
   if (!todoCtrl.todoCtx) return null;
 
-  const editableTodo = todoCtrl.todoCtx.todoStore.find(
-    (todo) => todo.id === id,
-  );
-
-  if (!editableTodo) return null;
-
   const {
     currentTodoItems,
+    currentDescription,
+    currentTitle,
     setCurrentDescription,
     setCurrentTitle,
-    setCurrentTodoItems,
+    mutateCurrentTodoItems,
   } = todoCtrl.todoCtx;
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
   useEffect(() => {
-    // set selected todo values to current context
-    setCurrentTodoItems(editableTodo.todoItems);
-    return () => {
-      // clear todo items on unmount
-      setCurrentTodoItems([]);
-    };
+    // get stored todos and set default todo data
+    getStoredTodos().then((todos) => {
+      const todo = todos.find((t) => t.id === id);
+      if (todo) {
+        setCurrentTitle(todo.title);
+        setCurrentDescription(todo.description ?? "");
+        mutateCurrentTodoItems({
+          name: "SET_DEFAULT",
+          value: todo.todoItems,
+        });
+      }
+    });
   }, []);
 
   return (
     <Fragment>
       <View style={styles.container}>
+        <MutateAction />
         <CustomTextInput
           name="Title"
-          defaultValue={editableTodo.title}
+          value={currentTitle}
           onChangeText={setCurrentTitle}
           placeholder="Name your todos"
         />
         <CustomTextInput
           name="Description"
-          defaultValue={editableTodo.description}
+          value={currentDescription}
           onChangeText={setCurrentDescription}
           placeholder="Optional short description"
         />
         <FlatList
           style={styles.todoOutput}
-          data={currentTodoItems}
+          data={currentTodoItems.sort(sortDoneLast)}
           keyExtractor={({ id }) => id}
           renderItem={({ item, index }) => (
             <TodoItem
               {...item}
-              setTodoItems={setCurrentTodoItems}
               serialNumber={index + 1}
               setTodoText={todoCtrl.setTodoText}
-              editTodoItemIdRef={todoCtrl.editTodoItemIdRef}
+              mutateCurrentTodoItems={mutateCurrentTodoItems}
+              currentTodoItemEditIdRef={todoCtrl.currentTodoItemEditIdRef}
             />
           )}
         />
@@ -71,7 +78,7 @@ export default function EditTodo() {
         value={todoCtrl.todoText}
         onChangeText={todoCtrl.setTodoText}
         placeholder="Enter what you want to do..."
-        onSubmitEditing={todoCtrl.handleSubmit}
+        onSubmitEditing={todoCtrl.handleTodoItemSubmit}
       />
     </Fragment>
   );
@@ -79,11 +86,7 @@ export default function EditTodo() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: MARGIN_TOP,
-    marginBottom: 35,
-    marginHorizontal: 15,
-    gap: 24,
+    ...BOXED_STYLES.column,
   },
   todoInput: {
     position: "fixed",

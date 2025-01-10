@@ -7,7 +7,7 @@ export default function NoTodoYet() {
     <Fragment>
       <View style={styles.addWrapper}>
         <View>
-          <Link href="/todos">
+          <Link href="/todos/new">
             <Text style={styles.plusSign}>+</Text>
           </Link>
         </View>

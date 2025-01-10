@@ -1,24 +1,37 @@
 import CustomTextInput from "@/components/CustomTextInput";
+import SaveBtn from "@/components/SaveTodoBtn";
 import TodoItem from "@/components/TodoItem";
-import { MARGIN_TOP } from "@/constants";
-import useTodoControl from "@/hooks/useTodoControl";
-import { Fragment } from "react";
+import { BOXED_STYLES, COLORS, MARGINS } from "@/constants";
+import useTodoItemControl from "@/hooks/useTodoItemControl";
+import { sortDoneLast } from "@/utils";
+import { Fragment, useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
 export default function AddTodo() {
-  const todoCtrl = useTodoControl();
+  const todoCtrl = useTodoItemControl();
 
   if (todoCtrl.todoCtx) {
     const {
-      currentDescription,
       currentTitle,
-      currentTodoItems,
-      setCurrentDescription,
+      currentDescription,
       setCurrentTitle,
-      setCurrentTodoItems,
+      setCurrentDescription,
+      currentTodoItems,
+      mutateCurrentTodoItems,
     } = todoCtrl.todoCtx;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
+    useEffect(() => {
+      // clear current todo item inputs on mount
+      setCurrentTitle("");
+      setCurrentDescription("");
+      mutateCurrentTodoItems({ name: "CLEAR" });
+    }, []);
+
     return (
       <Fragment>
+        <SaveBtn />
         <View style={styles.container}>
           <CustomTextInput
             name="Title"
@@ -34,15 +47,15 @@ export default function AddTodo() {
           />
           <FlatList
             style={styles.todoOutput}
-            data={currentTodoItems}
+            data={currentTodoItems.sort(sortDoneLast)}
             keyExtractor={({ id }) => id}
             renderItem={({ item, index }) => (
               <TodoItem
                 {...item}
-                setTodoItems={setCurrentTodoItems}
                 serialNumber={index + 1}
                 setTodoText={todoCtrl.setTodoText}
-                editTodoItemIdRef={todoCtrl.editTodoItemIdRef}
+                mutateCurrentTodoItems={mutateCurrentTodoItems}
+                currentTodoItemEditIdRef={todoCtrl.currentTodoItemEditIdRef}
               />
             )}
           />
@@ -52,7 +65,7 @@ export default function AddTodo() {
           value={todoCtrl.todoText}
           onChangeText={todoCtrl.setTodoText}
           placeholder="Enter what you want to do..."
-          onSubmitEditing={todoCtrl.handleSubmit}
+          onSubmitEditing={todoCtrl.handleTodoItemSubmit}
         />
       </Fragment>
     );
@@ -62,18 +75,14 @@ export default function AddTodo() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: MARGIN_TOP,
-    marginBottom: 35,
-    marginHorizontal: 15,
-    gap: 24,
+    ...BOXED_STYLES.column,
   },
   todoInput: {
     position: "fixed",
     bottom: 20,
     left: 18,
     width: "90%",
-    backgroundColor: "lightgray",
+    backgroundColor: COLORS.secondary,
   },
   todoOutput: {},
 });

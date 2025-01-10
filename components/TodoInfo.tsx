@@ -3,6 +3,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useContext } from "react";
 import { TodoContext } from "./TodoContextProvider";
 import { useRouter } from "expo-router";
+import usePersistTodo from "@/hooks/usePersistTodo";
+import { TODO_STORE_KEY } from "@/constants";
 
 type TodoInfoProps = {
   id: string;
@@ -17,16 +19,17 @@ type TodoInfoProps = {
 export default function TodoInfo(props: TodoInfoProps) {
   const router = useRouter();
   const todoCtx = useContext(TodoContext);
+  const { deleteTodo } = usePersistTodo(TODO_STORE_KEY);
 
   const handleDelete = () => {
-    todoCtx?.mutateTodoStore({
-      type: "delete",
-      id: props.id,
+    deleteTodo(props.id).then((data) => {
+      // update the stored todos in context
+      todoCtx?.setStoredTodos(data);
     });
   };
   const handlePress = () => {
     todoCtx?.setCurrentTitle(props.title);
-    router.push(`/todos/edit/${props.id}`);
+    router.push(`/todos/${props.id}`);
   };
   const handleLongPress = () => {
     Alert.alert(

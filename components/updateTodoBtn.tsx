@@ -1,33 +1,32 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import { TodoContext } from "./TodoContextProvider";
+import usePersistTodo from "@/hooks/usePersistTodo";
+import { COLORS, TODO_STORE_KEY } from "@/constants";
 
 export default function UpdateBtn() {
   const todoCtx = useContext(TodoContext);
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { updateTodo, getStoredTodos } = usePersistTodo(TODO_STORE_KEY);
 
-  const handleUpdate = () => {
-    const oldTodo = todoCtx?.todoStore.find((todo) => todo.id === id);
+  const handleUpdate = async () => {
+    const data = await getStoredTodos();
+    const oldTodo = data.find((todo) => todo.id === id);
     // `title` is required to create a todo
     if (todoCtx?.currentTitle && oldTodo) {
-      todoCtx.mutateTodoStore({
-        type: "update",
+      // persist the todo to storage
+      const latestTodos = await updateTodo({
         id: id as string,
-        value: {
-          id: id as string,
-          title: todoCtx.currentTitle,
-          description: todoCtx.currentDescription,
-          todoItems: todoCtx.currentTodoItems,
-          createdAt: oldTodo.createdAt,
-          updatedAt: new Date().toString(),
-        },
+        title: todoCtx.currentTitle,
+        description: todoCtx.currentDescription,
+        todoItems: todoCtx.currentTodoItems,
+        createdAt: oldTodo.createdAt,
+        updatedAt: new Date().toString(),
       });
-      // clear inputs
-      todoCtx.setCurrentTitle("");
-      todoCtx.setCurrentDescription("");
-      todoCtx.setCurrentTodoItems([]);
+      // update the stored todos in context
+      todoCtx.setStoredTodos(latestTodos);
       // back to home screen
       router.dismissTo("/");
     }
@@ -35,18 +34,17 @@ export default function UpdateBtn() {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={handleUpdate}>
-        <Text style={styles.text}>Update</Text>
-      </Pressable>
+      <Button
+        title="Update"
+        disabled={!todoCtx?.currentTitle}
+        onPress={handleUpdate}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginRight: 10,
-  },
-  text: {
-    fontWeight: "bold",
+    flex: 1,
   },
 });
